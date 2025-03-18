@@ -1,0 +1,79 @@
+#preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #f8f4f4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  transition: all 0.35s;
+}
+
+.preloader-wrapper {
+  display: block;
+  margin-top: -120px;
+}
+.preloader-img {
+  width: 100px;
+  height: auto;
+  margin: 0 auto;
+  margin-bottom: 16px;
+  display: block;
+}
+.preloader-text {
+  margin: 0 auto;
+  text-align: center;
+}
+.preloader-title {
+  max-width:80%;
+  margin: 0 auto;
+  text-align: center;
+}
+@media (max-width: 767px) {
+  .preloader-title {
+    max-width:240px;
+  }
+  .preloader-wrapper {
+    margin-top: -88px;
+  }
+}
+@media (max-width: 350px) {
+  .preloader-img {
+    width: 88px;
+  }
+  .preloader-title {
+    max-width:160px;
+    margin-top: -12px;
+  }
+}
+/* 定义动画关键帧 */
+@keyframes float-animation {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.preloader-img {
+  /* 应用动画属性 */
+  animation-name: float-animation; /* 使用定义的关键帧名称 */
+  animation-duration: 2.5s; /* 动画持续时间，可根据需求调整 */
+  animation-timing-function: ease-in-out; /* 动画速度曲线，让动画更自然 */
+  animation-iteration-count: infinite; /* 无限循环动画 */
+  animation-direction: alternate; /* 动画在每次循环时反向播放，形成上下浮动的效果 */
+}
+
+/* 可选：添加一些额外样式以增强视觉效果 */
+.preloader-img {
+  position: relative; /* 确保浮动效果不影响其他元素布局 */
+  margin: 12px auto; /* 居中显示 */
+  max-width: 100%; /* 保持图片在容器内自适应大小 */
+}
