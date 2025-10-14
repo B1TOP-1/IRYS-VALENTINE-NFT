@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>钱包连接测试 - IRYS Valentine NFT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00ff00;
+            color: #00ff00;
+        }
+        .status.error {
+            background: rgba(255, 0, 0, 0.2);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+        }
+        .status.warning {
+            background: rgba(255, 255, 0, 0.2);
+            border: 1px solid #ffff00;
+            color: #ffff00;
+        }
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .info-label {
+            font-weight: bold;
+            color: #ffd700;
+        }
+        .info-value {
+            color: #fff;
+            word-break: break-all;
+        }
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+    </style>
+    <!-- Ethers.js for Web3 functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.6.9/dist/ethers.umd.min.js"></script>
+    <script src="js/contract-config.js"></script>
+    <script src="js/nft-mint.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 钱包连接测试</h1>
+        
+        <div class="test-section">
+            <h3>📋 环境检查</h3>
+            <div id="envStatus" class="status warning">检查中...</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">Ethers.js</div>
+                    <div id="ethersStatus" class="info-value">检查中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">钱包检测</div>
+                    <div id="walletStatus" class="info-value">检查中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">网络</div>
+                    <div id="networkStatus" class="info-value">检查中...</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">合约配置</div>
+                    <div id="contractStatus" class="info-value">检查中...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔌 钱包连接测试</h3>
+            <div id="connectionStatus" class="status warning">未连接</div>
+            <button onclick="testConnectWallet()" id="connectBtn">连接钱包</button>
+            <button onclick="testDisconnect()" id="disconnectBtn" disabled>断开连接</button>
+            <button onclick="refreshInfo()" id="refreshBtn" disabled>刷新信息</button>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 连接信息</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">钱包地址</div>
+                    <div id="walletAddress" class="info-value">未连接</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">网络ID</div>
+                    <div id="networkId" class="info-value">未连接</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">余额</div>
+                    <div id="walletBalance" class="info-value">未连接</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">连接状态</div>
+                    <div id="connectionState" class="info-value">未连接</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 测试日志</h3>
+            <div id="testLog" class="log">等待测试...</div>
+            <button onclick="clearLog()">清空日志</button>
+        </div>
+    </div>
+
+    <script>
+        let nftMinter = null;
+        let testLog = [];
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            testLog.push(logEntry);
+            
+            const logElement = document.getElementById('testLog');
+            logElement.innerHTML = testLog.slice(-20).join('<br>');
+            logElement.scrollTop = logElement.scrollHeight;
+            
+            console.log(logEntry);
+        }
+
+        function clearLog() {
+            testLog = [];
+            document.getElementById('testLog').innerHTML = '日志已清空';
+        }
+
+        function updateStatus(elementId, message, type = 'warning') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        function updateInfo(labelId, value) {
+            const element = document.getElementById(labelId);
+            if (element) {
+                element.textContent = value;
+            }
+        }
+
+        async function checkEnvironment() {
+            log('开始环境检查...');
+            
+            // 检查 Ethers.js
+            if (typeof ethers !== 'undefined') {
+                updateInfo('ethersStatus', '✅ 已加载');
+                log('Ethers.js 已加载');
+            } else {
+                updateInfo('ethersStatus', '❌ 未加载');
+                log('Ethers.js 未加载', 'error');
+                return false;
+            }
+
+            // 检查钱包
+            const wallets = [];
+            if (window.ethereum) wallets.push('MetaMask/通用钱包');
+            if (window.okxwallet) wallets.push('OKX钱包');
+            if (wallets.length > 0) {
+                updateInfo('walletStatus', `✅ 检测到: ${wallets.join(', ')}`);
+                log(`检测到钱包: ${wallets.join(', ')}`);
+            } else {
+                updateInfo('walletStatus', '❌ 未检测到钱包');
+                log('未检测到钱包', 'error');
+                return false;
+            }
+
+            // 检查网络
+            if (window.ethereum) {
+                try {
+                    const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                    updateInfo('networkStatus', `✅ 当前网络: ${chainId}`);
+                    log(`当前网络ID: ${chainId}`);
+                } catch (error) {
+                    updateInfo('networkStatus', '⚠️ 无法获取网络信息');
+                    log('无法获取网络信息: ' + error.message, 'warning');
+                }
+            }
+
+            // 检查合约配置
+            if (typeof CONTRACT_CONFIG !== 'undefined') {
+                updateInfo('contractStatus', '✅ 配置已加载');
+                log('合约配置已加载');
+            } else {
+                updateInfo('contractStatus', '❌ 配置未加载');
+                log('合约配置未加载', 'error');
+                return false;
+            }
+
+            updateStatus('envStatus', '环境检查完成', 'success');
+            log('环境检查完成');
+            return true;
+        }
+
+        async function testConnectWallet() {
+            log('开始连接钱包测试...');
+            updateStatus('connectionStatus', '连接中...', 'warning');
+            
+            try {
+                if (!nftMinter) {
+                    nftMinter = new NFTMinter();
+                    log('NFTMinter 实例已创建');
+                }
+
+                await nftMinter.connectWallet();
+                
+                updateStatus('connectionStatus', '连接成功', 'success');
+                updateInfo('walletAddress', nftMinter.userAddress || '未知');
+                updateInfo('connectionState', '已连接');
+                
+                // 获取网络信息
+                if (nftMinter.provider) {
+                    const network = await nftMinter.provider.getNetwork();
+                    updateInfo('networkId', network.chainId.toString());
+                    
+                    // 获取余额
+                    const balance = await nftMinter.provider.getBalance(nftMinter.userAddress);
+                    const balanceEth = ethers.utils.formatEther(balance);
+                    updateInfo('walletBalance', `${parseFloat(balanceEth).toFixed(4)} ETH`);
+                }
+
+                // 启用按钮
+                document.getElementById('connectBtn').disabled = true;
+                document.getElementById('disconnectBtn').disabled = false;
+                document.getElementById('refreshBtn').disabled = false;
+                
+                log('钱包连接成功');
+                
+            } catch (error) {
+                updateStatus('connectionStatus', '连接失败: ' + error.message, 'error');
+                log('钱包连接失败: ' + error.message, 'error');
+            }
+        }
+
+        async function testDisconnect() {
+            log('断开钱包连接...');
+            
+            if (nftMinter) {
+                nftMinter.disconnect();
+            }
+            
+            updateStatus('connectionStatus', '已断开', 'warning');
+            updateInfo('walletAddress', '未连接');
+            updateInfo('networkId', '未连接');
+            updateInfo('walletBalance', '未连接');
+            updateInfo('connectionState', '未连接');
+            
+            // 禁用按钮
+            document.getElementById('connectBtn').disabled = false;
+            document.getElementById('disconnectBtn').disabled = true;
+            document.getElementById('refreshBtn').disabled = true;
+            
+            log('钱包已断开连接');
+        }
+
+        async function refreshInfo() {
+            if (nftMinter && nftMinter.isConnected) {
+                log('刷新钱包信息...');
+                await nftMinter.refreshInfo();
+                log('钱包信息已刷新');
+            } else {
+                log('钱包未连接，无法刷新信息', 'warning');
+            }
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', async function() {
+            log('页面加载完成，开始初始化...');
+            
+            const envOk = await checkEnvironment();
+            if (envOk) {
+                log('环境检查通过，可以开始测试');
+            } else {
+                log('环境检查失败，请检查配置', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

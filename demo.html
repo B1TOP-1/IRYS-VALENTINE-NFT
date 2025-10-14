@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRYS Valentine NFT - 美化钱包显示演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .demo-title {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        .feature-list li:before {
+            content: "✨";
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .highlight {
+            background: rgba(255, 107, 107, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 IRYS Valentine NFT - 美化钱包显示演示</h1>
+        
+        <div class="demo-section">
+            <h2 class="demo-title">✨ 新功能特性</h2>
+            <ul class="feature-list">
+                <li><strong>美化钱包信息显示</strong> - 只显示钱包地址，界面更简洁美观</li>
+                <li><strong>玻璃拟态设计</strong> - 使用毛玻璃效果和渐变背景</li>
+                <li><strong>动画效果</strong> - 添加浮动、脉冲和滑入动画</li>
+                <li><strong>小精灵元素</strong> - 在3D场景中添加可爱的小精灵</li>
+                <li><strong>响应式设计</strong> - 适配不同屏幕尺寸</li>
+                <li><strong>断开连接功能</strong> - 新增断开钱包连接按钮</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">🎯 钱包显示优化</h2>
+            <p>原来的钱包信息显示过于复杂，现在简化为：</p>
+            <div class="code-block">
+                <div style="color: #4ecdc4;">✅ 钱包已连接</div>
+                <div style="color: #ccc; font-size: 12px; margin: 5px 0;">钱包地址</div>
+                <div style="color: #fff; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; font-family: monospace;">
+                    0x1234...5678
+                </div>
+                <div style="color: #ccc; font-size: 12px; margin: 5px 0;">网络</div>
+                <div style="color: #4ecdc4;">Ethereum Mainnet</div>
+            </div>
+        </div>
+
+
+        <div class="demo-section">
+            <h2 class="demo-title">🎨 设计改进</h2>
+            <p>主要的设计改进包括：</p>
+            <div class="code-block">
+                <div><span class="highlight">玻璃拟态效果</span> - backdrop-filter: blur(20px)</div>
+                <div><span class="highlight">渐变背景</span> - linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05))</div>
+                <div><span class="highlight">动画效果</span> - @keyframes float, pulse, slideInUp</div>
+                <div><span class="highlight">装饰元素</span> - 浮动圆形背景装饰</div>
+                <div><span class="highlight">按钮优化</span> - 圆角设计，悬停效果</div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">🚀 使用方法</h2>
+            <p>1. 打开 <code>index.html</code> 文件</p>
+            <p>2. 点击 <strong>"链接钱包"</strong> 按钮</p>
+            <p>3. 连接成功后，将显示美化的钱包信息卡片</p>
+            <p>4. 在3D场景中可以看到小精灵在飞舞</p>
+            <p>5. 点击 <strong>"断开连接"</strong> 可以断开钱包</p>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">📱 技术实现</h2>
+            <p>主要技术栈：</p>
+            <ul class="feature-list">
+                <li><strong>HTML5 + CSS3</strong> - 现代化界面设计</li>
+                <li><strong>JavaScript ES6+</strong> - 交互逻辑实现</li>
+                <li><strong>Matter.js</strong> - 3D物理引擎</li>
+                <li><strong>Ethers.js</strong> - 区块链交互</li>
+                <li><strong>CSS动画</strong> - 流畅的视觉效果</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

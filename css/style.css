@@ -396,6 +396,7 @@ a.download-btn span{
     width: 20px;
     height: 20px;
 }
+
 .ic-behance:hover{
     fill: #0056ff;
 }
@@ -563,20 +564,21 @@ a.social-text-link{
 }
 
 .tricks-circle:nth-child(17) {
-    background-image: url("../images/3d/heart.png");
+    background-image: url("../images/3d/Generated Image September 18, 2025 - 5_35PM.png");
 }
 
 .tricks-circle:nth-child(18) {
-    background-image: url("../images/3d/key.png");
+    background-image: url("../images/3d/Generated Image September 18, 2025 - 5_35PM.png");
 }
 
 .tricks-circle:nth-child(19) {
-    background-image: url("../images/3d/heart-double.png");
+    background-image: url("../images/3d/Generated Image September 18, 2025 - 5_35PM.png");
 }
 
 .tricks-circle:nth-child(20) {
-    background-image: url("../images/3d/message.png");
+    background-image: url("../images/3d/Generated Image September 18, 2025 - 5_35PM.png");
 }
+
 .tricks-canvas {
     position: fixed;
     width: 100vw;
@@ -634,7 +636,7 @@ html.w-mod-touch * {
 .marquee-top{
     top: 0;
     left: 0;
-    width:100%;
+    width: 100vw;
     z-index:9;
 }
 
@@ -648,6 +650,8 @@ html.w-mod-touch * {
     position: fixed;
     top: 0;
     left: 0;
+    width: 60px;
+    height: 100vh;
     transform-origin:left bottom;
     transform: rotate(90deg);
     z-index: 7;
@@ -657,10 +661,39 @@ html.w-mod-touch * {
     position: fixed;
     top: 0;
     right: 0;
-    width: 100vh;
+    width: 60px;
+    height: 100vh;
     transform-origin:right bottom;
     transform: rotate(270deg);
     z-index: 6;
+    min-width: 100vh;
+}
+
+/* 侧边跑马灯专用样式 */
+.marquee-left .top-c-rail .top-c-rail_inner {
+    display: flex;
+    height: 100%;
+    -webkit-animation-name: railLeft;
+    animation-name: railLeft;
+    -webkit-animation-duration:var(--marquee-time) !important;
+    animation-duration:var(--marquee-time) !important;
+    -webkit-animation-play-state: running;
+    animation-play-state: running;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.marquee-right .top-c-rail .top-c-rail_inner {
+    display: flex;
+    height: 100%;
+    -webkit-animation-name: railRight;
+    animation-name: railRight;
+    -webkit-animation-duration:var(--marquee-time) !important;
+    animation-duration:var(--marquee-time) !important;
+    -webkit-animation-play-state: running;
+    animation-play-state: running;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
 }
 
 /* 容器的基本样式 */

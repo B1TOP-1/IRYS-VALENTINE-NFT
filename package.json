@@ -1,0 +1,37 @@
+{
+  "name": "valentine-nft-irys",
+  "version": "1.0.0",
+  "description": "Valentine NFT Collection using IRYS Token on IRYS Testnet",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js --network irysTestnet",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat",
+    "upload": "node upload-to-pinata.js",
+    "verify": "hardhat verify --network irysTestnet",
+    "node": "hardhat node",
+    "clean": "hardhat clean"
+  },
+  "keywords": [
+    "nft",
+    "valentine",
+    "irys",
+    "blockchain",
+    "ethereum",
+    "smart-contracts"
+  ],
+  "author": "IRYS-AI",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.19.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.15.0",
+    "form-data": "^4.0.0"
+  }
+}

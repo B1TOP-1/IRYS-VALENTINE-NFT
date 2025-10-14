@@ -1,0 +1,25 @@
+# 环境变量文件 - 包含私钥和 API 密钥
+env.local
+.env
+.env.local
+
+# 部署信息 - 包含部署地址等敏感信息
+deployment-info.json
+
+# NFT上传结果 - 包含 NFT 元数据
+nft-upload-results.json
+
+# Node modules (可选 - 通常不上传，因为文件太多)
+# node_modules/
+
+# 操作系统文件
+.DS_Store
+Thumbs.db
+
+# IDE 文件
+.vscode/
+.idea/
+
+# 日志文件
+*.log
+

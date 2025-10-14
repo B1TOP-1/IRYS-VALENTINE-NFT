@@ -18,8 +18,13 @@ setTimeout(() => {
     setTimeout(() => {
         preloader.style.display = 'none';
         document.getElementById('tricks-view').style.display = 'block';
+        
+        // 主页面加载完成后，通知NFT Minter可以开始计时
+        if (window.nftMinter && window.nftMinter.onMainPageLoaded) {
+            window.nftMinter.onMainPageLoaded();
+        }
     }, 400);
-}, 2000);
+}, 1000);
 
 
 
@@ -129,6 +134,8 @@ $(".tricks-view").one("inview", function (event, isInView) {
         window.polar = polar;
       }
     }
+    
+    
     let mousepos = {
       x: 0,
       y: 0,
@@ -142,6 +149,7 @@ $(".tricks-view").one("inview", function (event, isInView) {
     for (var i = 0; i < numCircles; i++) {
       tricksCircles.push(new tricksCircle());
     }
+    
     ground = Matter.Bodies.rectangle(w / 2, h + 30, 50000, 60, {
       isStatic: true,
     });
@@ -166,6 +174,8 @@ $(".tricks-view").one("inview", function (event, isInView) {
         trickscirc.update();
         trickscirc.lookAt(mousepos);
       });
+      
+      
     });
     // End In View
   } else {
