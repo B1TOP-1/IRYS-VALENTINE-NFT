@@ -29,8 +29,9 @@ class NFTMinter {
             }
             
             // 检查是否有已连接的钱包
-            if (window.ethereum) {
-                this.provider = new ethers.providers.Web3Provider(window.ethereum);
+            const walletProvider = this.detectWallet();
+            if (walletProvider) {
+                this.provider = new ethers.providers.Web3Provider(walletProvider);
                 await this.checkConnection();
             }
             
@@ -60,9 +61,10 @@ class NFTMinter {
             disconnectBtn.addEventListener('click', this.disconnect.bind(this));
         }
         
-        // 监听账户变化
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
+        // 监听账户变化 - 支持多钱包
+        const walletProvider = this.detectWallet();
+        if (walletProvider) {
+            walletProvider.on('accountsChanged', (accounts) => {
                 if (accounts.length === 0) {
                     this.disconnect();
                 } else {
@@ -71,7 +73,23 @@ class NFTMinter {
                 }
             });
             
-            window.ethereum.on('chainChanged', () => {
+            walletProvider.on('chainChanged', () => {
+                window.location.reload();
+            });
+        }
+        
+        // 同时监听OKX钱包事件
+        if (window.okxwallet && window.okxwallet.ethereum) {
+            window.okxwallet.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    this.disconnect();
+                } else {
+                    this.userAddress = accounts[0];
+                    this.refreshInfo();
+                }
+            });
+            
+            window.okxwallet.ethereum.on('chainChanged', () => {
                 window.location.reload();
             });
         }
@@ -79,14 +97,22 @@ class NFTMinter {
     
     async checkConnection() {
         try {
-            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            const walletProvider = this.detectWallet();
+            if (!walletProvider) {
+                return;
+            }
+            
+            const accounts = await walletProvider.request({ method: 'eth_accounts' });
             if (accounts.length > 0) {
                 this.userAddress = accounts[0];
                 this.isConnected = true;
                 
                 // 先设置provider和signer
-                this.provider = new ethers.providers.Web3Provider(window.ethereum);
+                this.provider = new ethers.providers.Web3Provider(walletProvider);
                 this.signer = this.provider.getSigner();
+                
+                // 强制检查网络
+                await this.forceSwitchToIRYS();
                 
                 await this.setupContract();
                 this.showMintSection();
@@ -99,13 +125,15 @@ class NFTMinter {
     
     async connectWallet() {
         try {
-            if (!window.ethereum) {
-                alert(CONTRACT_CONFIG.errorMessages.noWallet);
+            // 检测可用的钱包
+            const walletProvider = this.detectWallet();
+            if (!walletProvider) {
+                alert('请安装OKX钱包或MetaMask钱包');
                 return;
             }
             
             // 请求连接钱包
-            const accounts = await window.ethereum.request({ 
+            const accounts = await walletProvider.request({ 
                 method: 'eth_requestAccounts' 
             });
             
@@ -117,11 +145,11 @@ class NFTMinter {
             this.isConnected = true;
             
             // 设置provider和signer
-            this.provider = new ethers.providers.Web3Provider(window.ethereum);
+            this.provider = new ethers.providers.Web3Provider(walletProvider);
             this.signer = this.provider.getSigner();
             
-            // 检查网络
-            await this.checkNetwork();
+            // 强制检查并切换到IRYS网络
+            await this.forceSwitchToIRYS();
             
             // 设置合约
             await this.setupContract();
@@ -144,25 +172,121 @@ class NFTMinter {
         }
     }
     
+    // 检测可用的钱包
+    detectWallet() {
+        // 优先检测OKX钱包
+        if (window.okxwallet && window.okxwallet.ethereum) {
+            console.log('检测到OKX钱包');
+            return window.okxwallet.ethereum;
+        }
+        
+        // 检测MetaMask钱包
+        if (window.ethereum) {
+            console.log('检测到MetaMask钱包');
+            return window.ethereum;
+        }
+        
+        // 检测其他钱包
+        if (window.web3 && window.web3.currentProvider) {
+            console.log('检测到其他Web3钱包');
+            return window.web3.currentProvider;
+        }
+        
+        return null;
+    }
+    
+    // 强制切换到IRYS网络
+    async forceSwitchToIRYS() {
+        try {
+            const walletProvider = this.detectWallet();
+            if (!walletProvider) {
+                throw new Error('未检测到钱包');
+            }
+            
+            const currentChainId = await walletProvider.request({ method: 'eth_chainId' });
+            const targetChainId = `0x${CONTRACT_CONFIG.network.chainId.toString(16)}`;
+            
+            console.log('当前网络ID:', currentChainId);
+            console.log('目标网络ID:', targetChainId);
+            
+            if (currentChainId !== targetChainId) {
+                console.log('需要切换网络到IRYS Testnet');
+                
+                try {
+                    // 尝试切换网络
+                    await walletProvider.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: targetChainId }],
+                    });
+                    console.log('网络切换成功');
+                } catch (switchError) {
+                    console.log('切换网络失败，尝试添加网络:', switchError);
+                    
+                    // 如果网络不存在，添加IRYS网络
+                    if (switchError.code === 4902) {
+                        await walletProvider.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: targetChainId,
+                                chainName: CONTRACT_CONFIG.network.name,
+                                rpcUrls: [CONTRACT_CONFIG.network.rpcUrl],
+                                blockExplorerUrls: CONTRACT_CONFIG.network.blockExplorerUrls,
+                                nativeCurrency: {
+                                    name: 'IRYS',
+                                    symbol: 'IRYS',
+                                    decimals: 18
+                                }
+                            }],
+                        });
+                        console.log('IRYS网络添加成功');
+                    } else {
+                        throw new Error(`网络切换失败: ${switchError.message}`);
+                    }
+                }
+            } else {
+                console.log('已在正确的IRYS网络上');
+            }
+            
+            // 验证网络切换是否成功
+            const finalChainId = await walletProvider.request({ method: 'eth_chainId' });
+            if (finalChainId !== targetChainId) {
+                throw new Error('网络切换失败，请手动切换到IRYS Testnet');
+            }
+            
+        } catch (error) {
+            console.error('强制切换网络失败:', error);
+            alert(`网络切换失败: ${error.message}\n\n请手动切换到IRYS Testnet网络\nRPC: ${CONTRACT_CONFIG.network.rpcUrl}\nChain ID: ${CONTRACT_CONFIG.network.chainId}`);
+            throw error;
+        }
+    }
+    
     async checkNetwork() {
         try {
             const network = await this.provider.getNetwork();
             if (network.chainId !== CONTRACT_CONFIG.network.chainId) {
                 // 尝试切换网络
                 try {
-                    await window.ethereum.request({
+                    const walletProvider = this.detectWallet();
+                    await walletProvider.request({
                         method: 'wallet_switchEthereumChain',
                         params: [{ chainId: `0x${CONTRACT_CONFIG.network.chainId.toString(16)}` }],
                     });
                 } catch (switchError) {
                     // 如果网络不存在，尝试添加网络
                     if (switchError.code === 4902) {
-                        await window.ethereum.request({
+                        const walletProvider = this.detectWallet();
+                        await walletProvider.request({
                             method: 'wallet_addEthereumChain',
                             params: [{
                                 chainId: `0x${CONTRACT_CONFIG.network.chainId.toString(16)}`,
                                 chainName: CONTRACT_CONFIG.network.name,
                                 rpcUrls: [CONTRACT_CONFIG.network.rpcUrl],
+                                blockExplorerUrls: CONTRACT_CONFIG.network.blockExplorerUrls,
+                                nativeCurrency: {
+                                    name: 'IRYS',
+                                    symbol: 'IRYS',
+                                    decimals: 18
+                                }
                             }],
                         });
                     } else {
