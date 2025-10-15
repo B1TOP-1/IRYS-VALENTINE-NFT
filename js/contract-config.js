@@ -8,7 +8,12 @@ const CONTRACT_CONFIG = {
         chainId: 1270, // IRYS Testnet
         name: "IRYS Testnet",
         rpcUrl: "https://testnet-rpc.irys.xyz/v1/execution-rpc",
-        blockExplorerUrls: ["https://explorer.irys.xyz"]
+        blockExplorerUrls: ["https://explorer.irys.xyz"],
+        nativeCurrency: {
+            name: "IRYS",
+            symbol: "IRYS",
+            decimals: 18
+        }
     },
     
     // ABI - 简化的NFT合约ABI
@@ -119,12 +124,13 @@ const CONTRACT_CONFIG = {
     // 错误消息
     errorMessages: {
         noWallet: "请安装OKX钱包或MetaMask钱包",
-        wrongNetwork: "请切换到正确的网络",
+        wrongNetwork: "请切换到IRYS Testnet网络 (Chain ID: 1270)",
         userRejected: "用户取消了连接",
         contractError: "合约调用失败",
         insufficientFunds: "余额不足",
         mintNotActive: "铸造功能未激活",
-        maxMintReached: "已达到最大铸造数量"
+        maxMintReached: "已达到最大铸造数量",
+        networkSwitchFailed: "网络切换失败，请手动切换到IRYS Testnet网络"
     }
 };
 
