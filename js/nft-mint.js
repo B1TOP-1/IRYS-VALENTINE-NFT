@@ -7,6 +7,7 @@ class NFTMinter {
         this.userAddress = null;
         this.isConnected = false;
         this.isMinting = false; // 防重复点击状态
+        this.isConnecting = false; // 防重复连接状态
         this.mainPageLoaded = false; // 主页面是否已加载
         this.pendingMintDisplay = false; // 是否有待显示的mint界面
         this.autoHideTimer = null; // 用于存储自动隐藏的定时器
@@ -124,6 +125,19 @@ class NFTMinter {
     }
     
     async connectWallet() {
+        // 防止重复连接
+        if (this.isConnecting) {
+            console.log('钱包连接已在进行中，请稍后重试');
+            return;
+        }
+        
+        if (this.isConnected) {
+            console.log('钱包已连接');
+            return;
+        }
+        
+        this.isConnecting = true;
+        
         try {
             // 检测可用的钱包
             const walletProvider = this.detectWallet();
@@ -132,12 +146,24 @@ class NFTMinter {
                 return;
             }
             
-            // 请求连接钱包
-            const accounts = await walletProvider.request({ 
-                method: 'eth_requestAccounts' 
-            });
+            // 请求连接钱包，添加错误处理
+            let accounts;
+            try {
+                accounts = await walletProvider.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+            } catch (requestError) {
+                console.error('钱包连接请求失败:', requestError);
+                if (requestError.code === 4001) {
+                    throw new Error(CONTRACT_CONFIG.errorMessages.userRejected);
+                } else if (requestError.code === -32002) {
+                    throw new Error('钱包连接请求已在进行中，请稍后重试');
+                } else {
+                    throw new Error('钱包连接失败: ' + requestError.message);
+                }
+            }
             
-            if (accounts.length === 0) {
+            if (!accounts || accounts.length === 0) {
                 throw new Error(CONTRACT_CONFIG.errorMessages.userRejected);
             }
             
@@ -169,6 +195,9 @@ class NFTMinter {
             } else {
                 alert('连接钱包失败: ' + error.message);
             }
+        } finally {
+            // 重置连接状态
+            this.isConnecting = false;
         }
     }
     
@@ -180,8 +209,8 @@ class NFTMinter {
             return window.okxwallet.ethereum;
         }
         
-        // 检测MetaMask钱包
-        if (window.ethereum) {
+        // 检测MetaMask钱包（避免重复日志）
+        if (window.ethereum && !window.okxwallet) {
             console.log('检测到MetaMask钱包');
             return window.ethereum;
         }
