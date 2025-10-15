@@ -210,8 +210,10 @@ openModals.forEach(function(openModal) {
 
 var span = document.getElementsByClassName("close")[0];
 
-span.onclick = function() {
-    document.getElementById('myModal').style.display = 'none';
+if (span) {
+    span.onclick = function() {
+        document.getElementById('myModal').style.display = 'none';
+    }
 }
 
 // //======================================================
