@@ -112,9 +112,7 @@ class NFTMinter {
                 this.provider = new ethers.providers.Web3Provider(walletProvider);
                 this.signer = this.provider.getSigner();
                 
-                // 强制检查网络
-                await this.forceSwitchToIRYS();
-                
+                // 不自动强制切换网络，让用户手动连接
                 await this.setupContract();
                 this.showMintSection();
                 this.refreshInfo();
@@ -142,7 +140,7 @@ class NFTMinter {
             // 检测可用的钱包
             const walletProvider = this.detectWallet();
             if (!walletProvider) {
-                alert('请安装OKX钱包或MetaMask钱包');
+                alert('请安装OKX钱包或MetaMask钱包\n\n推荐使用OKX钱包以获得最佳体验');
                 return;
             }
             
@@ -209,7 +207,13 @@ class NFTMinter {
             return window.okxwallet.ethereum;
         }
         
-        // 检测MetaMask钱包（避免重复日志）
+        // 检测OKX钱包的备用方式
+        if (window.okxwallet && window.okxwallet.bitcoin) {
+            console.log('检测到OKX钱包（备用方式）');
+            return window.okxwallet;
+        }
+        
+        // 检测MetaMask钱包
         if (window.ethereum && !window.okxwallet) {
             console.log('检测到MetaMask钱包');
             return window.ethereum;
